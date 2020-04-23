@@ -2,12 +2,41 @@ import 'package:ethereum_wallet/common/widgets/expanded_inkwell.dart';
 import 'package:ethereum_wallet/common/widgets/large_padding.dart';
 import 'package:ethereum_wallet/common/widgets/main_column.dart';
 import 'package:ethereum_wallet/common/widgets/medium_padding.dart';
+import 'package:ethereum_wallet/wallet/data/models/transaction.dart';
+import 'package:ethereum_wallet/wallet/data/repositories/transaction_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
 import 'style.dart';
 
-class WalletOverviewScreen extends StatelessWidget {
+// TODO: separate widget creation and data
+class WalletOverviewScreen extends StatefulWidget {
+  @override
+  _WalletOverviewScreenState createState() => _WalletOverviewScreenState();
+}
+
+class _WalletOverviewScreenState extends State<WalletOverviewScreen> {
+  List<Transaction> _transactions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _transactions = TransactionRepository.getData();
+  }
+
+  // TODO: add intl for date time format
+  List<Widget> _recentTransactions() => _transactions
+      .map(
+        (transaction) => ListTile(
+          dense: true,
+          leading: Icon(AntDesign.download),
+          title: Text('Received'),
+          subtitle: Text('5:00PM'),
+          trailing: Text(transaction.amount.toString()),
+        ),
+      )
+      .toList();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,6 +95,22 @@ class WalletOverviewScreen extends StatelessWidget {
                               ),
                             ],
                           ),
+                        ),
+                      ),
+                    ),
+                    LargePadding(
+                      bottom: Size.small,
+                      child: Text(
+                        'Recent Transactions',
+                        style: Theme.of(context).textTheme.title,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 480,
+                      child: Card(
+                        elevation: 1,
+                        child: Column(
+                          children: _recentTransactions(),
                         ),
                       ),
                     ),
